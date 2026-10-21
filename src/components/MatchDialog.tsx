@@ -102,17 +102,17 @@ export function MatchDialog({
     )
   }
 
-  /** Tischhälfte eines Teams: hier werden die Treffer DIESES Teams eingetragen. */
-  function TableSide({ team, tip, color }: { team: Team; tip: 'down' | 'up'; color: CupColor }) {
+  /** Tischhälfte eines Teams: hier stehen SEINE Becher, eingetragen werden die Treffer des Gegners (`shooter`). */
+  function TableSide({ shooter, tip, color }: { shooter: Team; tip: 'down' | 'up'; color: CupColor }) {
     const pyramid = (start: number, count: number) => (
       <CupPyramid
-        marks={marks[team.id]}
-        players={playersOf(team)}
+        marks={marks[shooter.id]}
+        players={playersOf(shooter)}
         start={start}
         count={count}
         tip={tip}
         color={color}
-        onTap={(i) => tap(team, i)}
+        onTap={(i) => tap(shooter, i)}
       />
     )
     const parts = [pyramid(0, cups)]
@@ -139,16 +139,16 @@ export function MatchDialog({
         </div>
 
         <p className="text-xs text-muted">
-          Auf jeder Seite die Treffer dieses Teams antippen: 1× = Spieler 1 · 2× = Spieler 2 · 3× = beide · 4× = wieder
+          Getroffene Becher auf der Seite des Gegners antippen: 1× = Spieler 1 · 2× = Spieler 2 · 3× = beide · 4× = wieder
           zurücksetzen
         </p>
 
-        {/* Tisch: Team 1 oben, Team 2 unten – die Spitzen der Pyramiden zeigen zur Mitte */}
+        {/* Tisch: Team 1 oben, Team 2 unten – jede Seite zeigt die eigenen Becher, die Spitzen zeigen zur Mitte */}
         <div className="mx-auto max-w-md space-y-2 rounded-2xl border-4 border-wood-dark bg-wood shadow-inner p-3">
           {TeamLabel({ team: team1 })}
-          {TableSide({ team: team1, tip: 'down', color: 'red' })}
+          {TableSide({ shooter: team2, tip: 'down', color: 'red' })}
           <div className="my-2 border-t-2 border-dashed border-wood-dark/60" />
-          {TableSide({ team: team2, tip: 'up', color: 'blue' })}
+          {TableSide({ shooter: team1, tip: 'up', color: 'blue' })}
           {TeamLabel({ team: team2 })}
         </div>
 

@@ -1,0 +1,36 @@
+@import 'tailwindcss';
+
+/* Warmes Kneipen-Theme */
+@theme {
+  --color-bg: #f6eedf; /* Creme */
+  --color-surface: #fffaf0; /* Karten */
+  --color-surface-2: #efe2c8; /* Beige, Eingabe-/Nebenflächen */
+  --color-line: #dfcca8;
+  --color-ink: #3a2616; /* Dunkelbraun, Text */
+  --color-muted: #7d6448;
+  --color-subtle: #a48b6c;
+  --color-head: #3a2414; /* Header */
+  --color-beer: #e3a21a; /* Bernstein */
+  --color-beer-dark: #c4870c;
+  --color-beer-ink: #9a5a00; /* Bernstein als Textfarbe auf Creme */
+  --color-wood: #d6ae74;
+  --color-wood-dark: #8b5a2b;
+  --color-cup: #c8202f; /* Rote Becher (Team 1) */
+  --color-cup-blue: #1d4ed8; /* Blaue Becher (Team 2) */
+  --color-cup-hit: #cbc2b3; /* Getroffener Becher (ausgegraut) */
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}

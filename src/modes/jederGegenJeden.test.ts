@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { CupMark, MatchResult, Team, TournamentState } from '../domain/types'
-import { jederGegenJeden } from './jederGegenJeden'
+import { jederGegenJeden, jederGegenJedenDoppel } from './jederGegenJeden'
 
 function makeState(count: number): TournamentState {
   const teams: Team[] = Array.from({ length: count }, (_, i) => ({
@@ -47,6 +47,18 @@ describe('Jeder-gegen-Jeden-Modus', () => {
     const state = makeState(6)
     playAll(state)
     const ko = Object.fromEntries(jederGegenJeden.resolveKnockout(state).map((m) => [m.id, m]))
+    expect([ko.final.team1Id, ko.final.team2Id]).toEqual(['t1', 't2'])
+    expect([ko.p3.team1Id, ko.p3.team2Id]).toEqual(['t3', 't4'])
+  })
+})
+
+describe('Jeder-gegen-Jeden-Modus (Doppel)', () => {
+  it('hat eigene ID, zwei Spieler pro Team und dieselbe K.O.-Logik', () => {
+    expect(jederGegenJedenDoppel.id).not.toBe(jederGegenJeden.id)
+    expect(jederGegenJedenDoppel.playersPerTeam).toBe(2)
+    const state = makeState(5)
+    playAll(state)
+    const ko = Object.fromEntries(jederGegenJedenDoppel.resolveKnockout(state).map((m) => [m.id, m]))
     expect([ko.final.team1Id, ko.final.team2Id]).toEqual(['t1', 't2'])
     expect([ko.p3.team1Id, ko.p3.team2Id]).toEqual(['t3', 't4'])
   })

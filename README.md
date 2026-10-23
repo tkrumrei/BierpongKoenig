@@ -20,9 +20,9 @@ Wer ein Turnier erstellt, bekommt einen Code. Alle mit diesem Code können live 
 | Spiel um Platz 3 | Verlierer der Halbfinals |
 | Finale | Sieger der Halbfinals |
 
-## Turniermodus „Jeder gegen Jeden“
+## Turniermodus „Jeder gegen Jeden“ (Einzel und Doppel)
 
-Einzelmodus mit 4–10 Spielern (beim Erstellen wählbar) in einer Gruppe, jeder gegen jeden. Tabelle wie oben: Siege → Becherdifferenz → direkter Vergleich.
+Einzel mit 4–10 Spielern bzw. Doppel mit 4–10 Teams (beim Erstellen wählbar) in einer Gruppe, jeder gegen jeden. Tabelle wie oben: Siege → Becherdifferenz → direkter Vergleich.
 
 | Spiel | Paarung |
 |---|---|

@@ -20,6 +20,15 @@ Wer ein Turnier erstellt, bekommt einen Code. Alle mit diesem Code können live 
 | Spiel um Platz 3 | Verlierer der Halbfinals |
 | Finale | Sieger der Halbfinals |
 
+## Turniermodus „Jeder gegen Jeden“
+
+Einzelmodus mit 4–10 Spielern (beim Erstellen wählbar) in einer Gruppe, jeder gegen jeden. Tabelle wie oben: Siege → Becherdifferenz → direkter Vergleich.
+
+| Spiel | Paarung |
+|---|---|
+| Spiel um Platz 3 | 3. vs. 4. der Tabelle |
+| Finale | 1. vs. 2. der Tabelle |
+
 Weitere Modi kommen als eigene Datei nach `src/modes/` und werden in `src/modes/index.ts` registriert.
 
 ## Einrichtung

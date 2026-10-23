@@ -23,16 +23,6 @@ const TABS: [Tab, string][] = [
   ['regeln', 'Regeln'],
 ]
 
-// Platzhalter für K.O.-Spiele, solange die Teams noch nicht feststehen (Saufsünden)
-const KO_PLACEHOLDERS: Record<string, [string, string]> = {
-  qfA: ['2. Gruppe A', '3. Gruppe B'],
-  qfB: ['2. Gruppe B', '3. Gruppe A'],
-  sf1: ['1. Gruppe A', 'Sieger VF B'],
-  sf2: ['1. Gruppe B', 'Sieger VF A'],
-  p3: ['Verlierer HF 1', 'Verlierer HF 2'],
-  final: ['Sieger HF 1', 'Sieger HF 2'],
-}
-
 export function TournamentPage() {
   const code = normalizeCode(useParams().code ?? '')
   const [tournament, setTournament] = useState<Tournament | null>(null)
@@ -140,7 +130,7 @@ export function TournamentPage() {
             onClick={() => setTab(id)}
             className={`flex-1 rounded-lg py-2 text-sm font-semibold ${tab === id ? 'bg-beer text-ink' : 'text-muted hover:bg-surface-2'}`}
           >
-            {label}
+            {id === 'gruppen' && mode.groups.length === 1 ? 'Tabelle' : label}
           </button>
         ))}
       </nav>
@@ -151,7 +141,7 @@ export function TournamentPage() {
             const rows = groupStandings(state, g)
             return (
               <section key={g}>
-                <SectionTitle>Gruppe {g}</SectionTitle>
+                <SectionTitle>{mode.groups.length > 1 ? `Gruppe ${g}` : 'Tabelle'}</SectionTitle>
                 <Card className="mb-3 overflow-x-auto p-0">
                   <table className="w-full text-sm">
                     <thead className="text-xs text-subtle">
@@ -208,18 +198,20 @@ export function TournamentPage() {
               ['p3', 'Spiel um Platz 3'],
               ['final', 'Finale'],
             ] as const
-          ).map(([stage, title]) => (
-            <section key={stage}>
-              <SectionTitle>{title}</SectionTitle>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {knockout
-                  .filter((m) => m.stage === stage)
-                  .map((m) => (
-                    <MatchCard key={m.id} state={state} match={m} onOpen={setOpenMatch} placeholder={KO_PLACEHOLDERS[m.id]} />
-                  ))}
-              </div>
-            </section>
-          ))}
+          )
+            .filter(([stage]) => knockout.some((m) => m.stage === stage))
+            .map(([stage, title]) => (
+              <section key={stage}>
+                <SectionTitle>{title}</SectionTitle>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {knockout
+                    .filter((m) => m.stage === stage)
+                    .map((m) => (
+                      <MatchCard key={m.id} state={state} match={m} onOpen={setOpenMatch} placeholder={mode.knockoutPlaceholders[m.id]} />
+                    ))}
+                </div>
+              </section>
+            ))}
         </div>
       )}
 

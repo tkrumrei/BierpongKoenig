@@ -8,14 +8,14 @@ import { rememberTournament } from '../lib/recent'
 import { createTournament } from '../lib/tournamentStore'
 import { MODES, getMode } from '../modes'
 
-function emptySetup(modeId: string) {
+function emptySetup(modeId: string, teamCount = getMode(modeId).teamCount) {
   const mode = getMode(modeId)
-  const players: Player[] = Array.from({ length: mode.teamCount * mode.playersPerTeam }, () => ({
+  const players: Player[] = Array.from({ length: teamCount * mode.playersPerTeam }, () => ({
     id: newId(),
     name: '',
   }))
-  const teamsPerGroup = mode.teamCount / mode.groups.length
-  const teams: Team[] = Array.from({ length: mode.teamCount }, (_, i) => ({
+  const teamsPerGroup = teamCount / mode.groups.length
+  const teams: Team[] = Array.from({ length: teamCount }, (_, i) => ({
     id: newId(),
     name: '',
     playerIds: players.slice(i * mode.playersPerTeam, (i + 1) * mode.playersPerTeam).map((p) => p.id),
@@ -34,6 +34,8 @@ export function CreateTournament() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const single = mode.playersPerTeam === 1
+
   const playerName = (id: string) => players.find((p) => p.id === id)?.name.trim() ?? ''
   const filledCount = players.filter((p) => p.name.trim()).length
 
@@ -42,13 +44,22 @@ export function CreateTournament() {
     const filled = (id: string) => Boolean(players.find((p) => p.id === id)?.name.trim())
     if (!name.trim()) list.push('Turniername fehlt')
     // Ein-Personen-Teams sind erlaubt (§ 4 Abs. 1 TBG), leere Teams nicht
-    if (teams.some((t) => !t.playerIds.some(filled))) list.push('Jedes Team braucht mindestens einen Spieler')
+    if (teams.some((t) => !t.playerIds.some(filled)))
+      list.push(single ? 'Jeder Spieler braucht einen Namen' : 'Jedes Team braucht mindestens einen Spieler')
     return list
-  }, [name, players, teams])
+  }, [name, players, teams, single])
 
   function changeMode(id: string) {
     setModeId(id)
     setSetup(emptySetup(id))
+  }
+
+  /** Ändert die Teamanzahl (nur bei Modi mit teamCountRange); bereits eingetragene Namen bleiben erhalten. */
+  function changeTeamCount(count: number) {
+    setSetup((s) => {
+      const next = emptySetup(modeId, count)
+      return { ...next, players: next.players.map((p, i) => ({ ...p, name: s.players[i]?.name ?? '' })) }
+    })
   }
 
   function setPlayerName(id: string, value: string) {
@@ -117,7 +128,10 @@ export function CreateTournament() {
                 <div className="font-bold">
                   {m.name}{' '}
                   <span className="text-xs font-normal text-muted">
-                    · {m.playersPerTeam === 2 ? 'Doppel' : 'Einzel'} · {m.teamCount} Teams
+                    · {m.playersPerTeam === 2 ? 'Doppel' : 'Einzel'} ·{' '}
+                    {m.teamCountRange
+                      ? `${m.teamCountRange[0]}–${m.teamCountRange[1]} ${m.playersPerTeam === 1 ? 'Spieler' : 'Teams'}`
+                      : `${m.teamCount} Teams`}
                   </span>
                 </div>
                 <div className="text-sm text-muted">{m.description}</div>
@@ -125,6 +139,31 @@ export function CreateTournament() {
             ))}
           </div>
         </div>
+        {mode.teamCountRange && (
+          <div>
+            <label className="mb-1 block text-sm text-muted">{single ? 'Anzahl Spieler' : 'Anzahl Teams'}</label>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="secondary"
+                onClick={() => changeTeamCount(teams.length - 1)}
+                disabled={teams.length <= mode.teamCountRange[0]}
+                className="w-12"
+              >
+                −
+              </Button>
+              <span className="w-8 text-center text-lg font-bold tabular-nums">{teams.length}</span>
+              <Button
+                variant="secondary"
+                onClick={() => changeTeamCount(teams.length + 1)}
+                disabled={teams.length >= mode.teamCountRange[1]}
+                className="w-12"
+              >
+                +
+              </Button>
+              <span className="text-sm text-muted">{(teams.length * (teams.length - 1)) / 2} Gruppenspiele</span>
+            </div>
+          </div>
+        )}
         <div>
           <label className="mb-1 block text-sm text-muted">Becher pro Team</label>
           <div className="flex gap-2">
@@ -142,27 +181,38 @@ export function CreateTournament() {
       <Card>
         <div className="mb-3 flex items-center justify-between gap-2">
           <SectionTitle>
-            Teams · {filledCount}/{players.length} Spieler
+            {single ? 'Spieler' : 'Teams'} · {filledCount}/{players.length}{single ? '' : ' Spieler'}
           </SectionTitle>
-          <Button
-            variant="secondary"
-            onClick={shuffle}
-            disabled={filledCount < teams.length}
-            title="Namen zufällig auf alle Teams verteilen (mind. ein Spieler pro Team)"
-            className="text-sm"
-          >
-            🎲 Zufällig
-          </Button>
+          {!single && (
+            <Button
+              variant="secondary"
+              onClick={shuffle}
+              disabled={filledCount < teams.length}
+              title="Namen zufällig auf alle Teams verteilen (mind. ein Spieler pro Team)"
+              className="text-sm"
+            >
+              🎲 Zufällig
+            </Button>
+          )}
         </div>
         <div className="space-y-5">
           {mode.groups.map((g) => (
             <div key={g}>
-              <h3 className="mb-2 font-bold text-beer-ink">Gruppe {g}</h3>
+              {mode.groups.length > 1 && <h3 className="mb-2 font-bold text-beer-ink">Gruppe {g}</h3>}
               <div className="space-y-2">
                 {teams
                   .filter((t) => t.group === g)
                   .map((t) => {
                     const number = teams.indexOf(t) + 1
+                    if (single)
+                      return (
+                        <Input
+                          key={t.id}
+                          value={players.find((p) => p.id === t.playerIds[0])?.name ?? ''}
+                          onChange={(e) => setPlayerName(t.playerIds[0], e.target.value)}
+                          placeholder={`Spieler ${number}`}
+                        />
+                      )
                     return (
                       <div key={t.id} className="space-y-2 rounded-lg bg-surface-2 p-3">
                         <Input

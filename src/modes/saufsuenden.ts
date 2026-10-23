@@ -57,4 +57,13 @@ export const saufsuenden: TournamentMode = {
     const final: Match = { id: 'final', stage: 'final', label: 'Finale', team1Id: winner(state, sf1), team2Id: winner(state, sf2) }
     return [qfA, qfB, sf1, sf2, p3, final]
   },
+
+  knockoutPlaceholders: {
+    qfA: ['2. Gruppe A', '3. Gruppe B'],
+    qfB: ['2. Gruppe B', '3. Gruppe A'],
+    sf1: ['1. Gruppe A', 'Sieger VF B'],
+    sf2: ['1. Gruppe B', 'Sieger VF A'],
+    p3: ['Verlierer HF 1', 'Verlierer HF 2'],
+    final: ['Sieger HF 1', 'Sieger HF 2'],
+  },
 }

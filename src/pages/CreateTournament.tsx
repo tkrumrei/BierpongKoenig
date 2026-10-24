@@ -131,7 +131,7 @@ export function CreateTournament() {
                     · {m.playersPerTeam === 2 ? 'Doppel' : 'Einzel'} ·{' '}
                     {m.teamCountRange
                       ? `${m.teamCountRange[0]}–${m.teamCountRange[1]} ${m.playersPerTeam === 1 ? 'Spieler' : 'Teams'}`
-                      : `${m.teamCount} Teams`}
+                      : `${m.teamCount} ${m.playersPerTeam === 1 ? 'Spieler' : 'Teams'}`}
                   </span>
                 </div>
                 <div className="text-sm text-muted">{m.description}</div>

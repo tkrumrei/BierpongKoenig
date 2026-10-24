@@ -29,6 +29,10 @@ Einzel mit 4–10 Spielern bzw. Doppel mit 4–10 Teams (beim Erstellen wählbar
 | Spiel um Platz 3 | 3. vs. 4. der Tabelle |
 | Finale | 1. vs. 2. der Tabelle |
 
+## Turniermodus „11er-Runde“
+
+11 Spieler im Einzel. Jeder spielt 4 Gruppenspiele gegen feste, wechselnde Gegner (Spieler *i* gegen *i*±1 und *i*±3 in der Eingabereihenfolge), zwischen zwei eigenen Spielen liegen mindestens zwei andere. Tabelle wie oben, danach Finale (1. vs. 2.) und Spiel um Platz 3 (3. vs. 4.) – niemand spielt mehr als 5 Spiele.
+
 Weitere Modi kommen als eigene Datei nach `src/modes/` und werden in `src/modes/index.ts` registriert.
 
 ## Einrichtung

@@ -1,4 +1,5 @@
 import type { Match, TournamentState } from '../domain/types'
+import { elferRunde } from './elferRunde'
 import { jederGegenJeden, jederGegenJedenDoppel } from './jederGegenJeden'
 import { saufsuenden } from './saufsuenden'
 import type { TournamentMode } from './types'
@@ -7,6 +8,7 @@ export const MODES: Record<string, TournamentMode> = {
   [saufsuenden.id]: saufsuenden,
   [jederGegenJeden.id]: jederGegenJeden,
   [jederGegenJedenDoppel.id]: jederGegenJedenDoppel,
+  [elferRunde.id]: elferRunde,
 }
 
 export function getMode(id: string): TournamentMode {

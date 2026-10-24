@@ -29,9 +29,11 @@ Einzel mit 4–10 Spielern bzw. Doppel mit 4–10 Teams (beim Erstellen wählbar
 | Spiel um Platz 3 | 3. vs. 4. der Tabelle |
 | Finale | 1. vs. 2. der Tabelle |
 
-## Turniermodus „11er-Runde“
+## Turniermodus „Ligaphase“
 
-11 Spieler im Einzel, ähnlich der Champions-League-Ligaphase: eine Tabelle, jeder spielt 4 Gruppenspiele gegen beim Turnierstart zufällig ausgeloste Gegner, zwischen zwei eigenen Spielen liegen mindestens zwei andere. Tabelle wie oben, danach Finale (1. vs. 2.) und Spiel um Platz 3 (3. vs. 4.) – niemand spielt mehr als 5 Spiele.
+Einzel wie die Champions-League-Ligaphase: eine Tabelle, jeder spielt gleich viele Gruppenspiele gegen beim Turnierstart zufällig ausgeloste Gegner. Spielerzahl (4–40) und Gruppenspiele pro Spieler sind beim Erstellen wählbar – bei ungerader Spielerzahl nur eine gerade Anzahl, damit jeder gleich oft spielt. Die Spiele sind so sortiert, dass möglichst niemand direkt hintereinander spielt. Danach Finale (1. vs. 2.) und Spiel um Platz 3 (3. vs. 4.).
+
+Beispiel: 11 Spieler mit je 4 Gruppenspielen → 22 Gruppenspiele, niemand spielt mehr als 5 Spiele.
 
 Weitere Modi kommen als eigene Datei nach `src/modes/` und werden in `src/modes/index.ts` registriert.
 

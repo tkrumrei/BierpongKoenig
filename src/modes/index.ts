@@ -1,14 +1,14 @@
 import type { Match, TournamentState } from '../domain/types'
-import { elferRunde } from './elferRunde'
 import { jederGegenJeden, jederGegenJedenDoppel } from './jederGegenJeden'
+import { ligaphase } from './ligaphase'
 import { saufsuenden } from './saufsuenden'
-import type { TournamentMode } from './types'
+import type { ModeSettings, TournamentMode } from './types'
 
 export const MODES: Record<string, TournamentMode> = {
   [saufsuenden.id]: saufsuenden,
   [jederGegenJeden.id]: jederGegenJeden,
   [jederGegenJedenDoppel.id]: jederGegenJedenDoppel,
-  [elferRunde.id]: elferRunde,
+  [ligaphase.id]: ligaphase,
 }
 
 export function getMode(id: string): TournamentMode {
@@ -21,4 +21,4 @@ export function allMatches(state: TournamentState, modeId: string): Match[] {
   return [...state.groupMatches, ...getMode(modeId).resolveKnockout(state)]
 }
 
-export type { TournamentMode }
+export type { ModeSettings, TournamentMode }

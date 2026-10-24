@@ -7,6 +7,7 @@ import { newId } from '../lib/code'
 import { rememberTournament } from '../lib/recent'
 import { createTournament } from '../lib/tournamentStore'
 import { MODES, getMode } from '../modes'
+import { closestGamesPerTeam, validGamesPerTeam } from '../modes/ligaphase'
 
 function emptySetup(modeId: string, teamCount = getMode(modeId).teamCount) {
   const mode = getMode(modeId)
@@ -31,10 +32,15 @@ export function CreateTournament() {
   const [name, setName] = useState('')
   const cups = 6
   const [{ players, teams }, setSetup] = useState(() => emptySetup(modeId))
+  const [wantedGames, setWantedGames] = useState(getMode(modeId).gamesPerTeam ?? 0)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const single = mode.playersPerTeam === 1
+  // Gewünschte Spielanzahl merken, aber immer einen gültigen Wert für die aktuelle Spielerzahl nehmen
+  const gamesPerTeam = mode.gamesPerTeam ? closestGamesPerTeam(teams.length, wantedGames) : undefined
+  const gameOptions = mode.gamesPerTeam ? validGamesPerTeam(teams.length) : []
+  const groupMatchCount = gamesPerTeam ? (teams.length * gamesPerTeam) / 2 : (teams.length * (teams.length - 1)) / 2
 
   const playerName = (id: string) => players.find((p) => p.id === id)?.name.trim() ?? ''
   const filledCount = players.filter((p) => p.name.trim()).length
@@ -52,6 +58,7 @@ export function CreateTournament() {
   function changeMode(id: string) {
     setModeId(id)
     setSetup(emptySetup(id))
+    setWantedGames(getMode(id).gamesPerTeam ?? 0)
   }
 
   /** Ändert die Teamanzahl (nur bei Modi mit teamCountRange); bereits eingetragene Namen bleiben erhalten. */
@@ -95,7 +102,7 @@ export function CreateTournament() {
         state: {
           players: finalPlayers,
           teams: finalTeams,
-          groupMatches: mode.createGroupMatches(finalTeams),
+          groupMatches: mode.createGroupMatches(finalTeams, { gamesPerTeam }),
           results: {},
         },
       })
@@ -160,8 +167,36 @@ export function CreateTournament() {
               >
                 +
               </Button>
-              <span className="text-sm text-muted">{(teams.length * (teams.length - 1)) / 2} Gruppenspiele</span>
+              <span className="text-sm text-muted">{groupMatchCount} Gruppenspiele</span>
             </div>
+          </div>
+        )}
+        {gamesPerTeam !== undefined && (
+          <div>
+            <label className="mb-1 block text-sm text-muted">Gruppenspiele pro {single ? 'Spieler' : 'Team'}</label>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="secondary"
+                onClick={() => setWantedGames(gameOptions[gameOptions.indexOf(gamesPerTeam) - 1])}
+                disabled={gamesPerTeam <= gameOptions[0]}
+                className="w-12"
+              >
+                −
+              </Button>
+              <span className="w-8 text-center text-lg font-bold tabular-nums">{gamesPerTeam}</span>
+              <Button
+                variant="secondary"
+                onClick={() => setWantedGames(gameOptions[gameOptions.indexOf(gamesPerTeam) + 1])}
+                disabled={gamesPerTeam >= gameOptions[gameOptions.length - 1]}
+                className="w-12"
+              >
+                +
+              </Button>
+              <span className="text-sm text-muted">max. {gamesPerTeam + 1} Spiele pro {single ? 'Spieler' : 'Team'}</span>
+            </div>
+            {teams.length % 2 === 1 && (
+              <p className="mt-1 text-xs text-subtle">Bei ungerader Spielerzahl geht nur eine gerade Anzahl, sonst bliebe einer ohne Gegner.</p>
+            )}
           </div>
         )}
         <div>

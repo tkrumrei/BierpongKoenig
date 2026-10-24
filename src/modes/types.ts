@@ -11,7 +11,8 @@ export interface TournamentMode {
   /** Einzel = 1, Doppel = 2 */
   playersPerTeam: 1 | 2
   groups: string[]
-  createGroupMatches(teams: Team[]): Match[]
+  /** `random` nur für Tests, damit eine Auslosung reproduzierbar ist */
+  createGroupMatches(teams: Team[], random?: () => number): Match[]
   /** Leitet die K.O.-Paarungen aus Tabelle und Ergebnissen ab; noch unbekannte Teams sind null. */
   resolveKnockout(state: TournamentState): Match[]
   /** Anzeige für K.O.-Spiele, solange die Teams noch nicht feststehen (pro Match-ID) */

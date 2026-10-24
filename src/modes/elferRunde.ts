@@ -1,3 +1,4 @@
+import { shuffled } from '../domain/shuffle'
 import type { Match, Team } from '../domain/types'
 import { PLATZIERUNG_PLACEHOLDERS, platzierungsspiele } from './jederGegenJeden'
 import type { TournamentMode } from './types'
@@ -33,12 +34,14 @@ export const elferRunde: TournamentMode = {
   id: 'elfer-runde',
   name: '11er-Runde',
   description:
-    '11 Spieler im Einzel, jeder spielt 4 Gruppenspiele gegen wechselnde Gegner. Danach spielen Platz 1 und 2 das Finale, Platz 3 und 4 das Spiel um Platz 3 – so hat niemand mehr als 5 Spiele.',
+    '11 Spieler im Einzel wie in der Champions League: eine Tabelle, jeder spielt 4 Gruppenspiele gegen zufällig ausgeloste Gegner. Danach spielen Platz 1 und 2 das Finale, Platz 3 und 4 das Spiel um Platz 3 – so hat niemand mehr als 5 Spiele.',
   teamCount: 11,
   playersPerTeam: 1,
   groups: [GROUP],
 
-  createGroupMatches(teams) {
+  createGroupMatches(entered, random: () => number = Math.random) {
+    // Auslosung: Wer gegen wen spielt, hängt nicht von der Eingabereihenfolge ab
+    const teams = shuffled(entered, random)
     const n = teams.length
     const pairs: [Team, Team][] = OFFSETS.flatMap((offset) =>
       teams.map((t, i): [Team, Team] => [t, teams[(i + offset) % n]]),

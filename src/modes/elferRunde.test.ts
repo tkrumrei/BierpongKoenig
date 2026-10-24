@@ -21,6 +21,19 @@ function result(team1: string, team2: string, winner: string): MatchResult {
 const num = (id: string) => Number(id.slice(1))
 
 describe('11er-Runde', () => {
+  it('lost die Gegner zufällig aus', () => {
+    const { teams } = makeState()
+    const pairings = (random: () => number) =>
+      elferRunde
+        .createGroupMatches(teams, random)
+        .map((m) => [m.team1Id, m.team2Id].sort().join('-'))
+        .sort()
+        .join(' ')
+    const seeded = (seed: number) => () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646
+    expect(pairings(seeded(1))).toBe(pairings(seeded(1)))
+    expect(pairings(seeded(1))).not.toBe(pairings(seeded(2)))
+  })
+
   it('jeder spielt genau 4 Gruppenspiele gegen 4 verschiedene Gegner', () => {
     const { groupMatches } = makeState()
     expect(groupMatches).toHaveLength(22)

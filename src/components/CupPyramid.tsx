@@ -13,9 +13,12 @@ function rows(count: number, tip: 'down' | 'up'): number[] {
   return tip === 'down' ? fromEdge : fromEdge.reverse()
 }
 
-function initials(name: string): string {
-  const parts = name.trim().split(/\s+/)
-  return (parts.length > 1 ? parts[0][0] + parts[1][0] : name.trim().slice(0, 2)).toUpperCase()
+/** Erste zwei Buchstaben des Vornamens, bei Nachnamen dessen erster Buchstabe dazu: „Tobias Krumrei“ → TOK */
+export function initials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (!parts.length) return ''
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : ''
+  return (parts[0].slice(0, 2) + last).toUpperCase()
 }
 
 /** Kürzel pro Spieler eines Teams; bei gleichen Kürzeln wird durchnummeriert (z. B. TO1/TO2). */
@@ -76,7 +79,7 @@ export function CupPyramid({
                 {mark === 3 ? (
                   <span className="text-base">2×</span>
                 ) : mark !== 0 ? (
-                  <span className="text-sm">{labels[mark - 1]}</span>
+                  <span className={labels[mark - 1].length > 3 ? 'text-xs' : 'text-sm'}>{labels[mark - 1]}</span>
                 ) : null}
               </button>
             )

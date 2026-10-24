@@ -192,10 +192,15 @@ export function CreateTournament() {
               >
                 +
               </Button>
-              <span className="text-sm text-muted">max. {gamesPerTeam + 1} Spiele pro {single ? 'Spieler' : 'Team'}</span>
+              <span className="text-sm text-muted">
+                + 1 Platzierungsspiel = {gamesPerTeam + 1} Spiele
+              </span>
             </div>
             {teams.length % 2 === 1 && (
-              <p className="mt-1 text-xs text-subtle">Bei ungerader Spielerzahl geht nur eine gerade Anzahl, sonst bliebe einer ohne Gegner.</p>
+              <p className="mt-1 text-xs text-subtle">
+                Bei ungerader Spielerzahl geht nur eine gerade Anzahl, sonst bliebe einer ohne Gegner. Der Letzte der
+                Tabelle hat kein Platzierungsspiel.
+              </p>
             )}
           </div>
         )}

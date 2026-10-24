@@ -1,6 +1,6 @@
 import { shuffled } from '../domain/shuffle'
-import type { Match, Team } from '../domain/types'
-import { PLATZIERUNG_PLACEHOLDERS, platzierungsspiele } from './jederGegenJeden'
+import type { Match, Stage, Team } from '../domain/types'
+import { groupComplete, groupStandings } from '../domain/standings'
 import type { TournamentMode } from './types'
 
 const GROUP = 'A'
@@ -50,13 +50,29 @@ function restedOrder(pairs: [Team, Team][]): [Team, Team][] {
   return order
 }
 
+const MAX_TEAMS = 40
+
+/** Spiel um Platz `rank` (1 = Finale, 3 = Platz 3, 5, 7, …) */
+function placeMatch(rank: number): Pick<Match, 'id' | 'stage' | 'label'> {
+  if (rank === 1) return { id: 'final', stage: 'final', label: 'Finale' }
+  const stage: Stage = rank === 3 ? 'p3' : 'place'
+  return { id: rank === 3 ? 'p3' : `p${rank}`, stage, label: `Spiel um Platz ${rank}` }
+}
+
+const PLACEHOLDERS = Object.fromEntries(
+  Array.from({ length: MAX_TEAMS / 2 }, (_, i) => {
+    const rank = 2 * i + 1
+    return [placeMatch(rank).id, [`${rank}. Platz`, `${rank + 1}. Platz`] as [string, string]]
+  }),
+)
+
 export const ligaphase: TournamentMode = {
   id: 'ligaphase',
   name: 'Ligaphase',
   description:
-    'Einzel wie in der Champions League: eine Tabelle, jeder spielt gleich viele Gruppenspiele gegen zufällig ausgeloste Gegner. Danach spielen Platz 1 und 2 das Finale, Platz 3 und 4 das Spiel um Platz 3.',
+    'Einzel wie in der Champions League: eine Tabelle, jeder spielt gleich viele Gruppenspiele gegen zufällig ausgeloste Gegner. Danach spielt jeder ein Platzierungsspiel: 1. gegen 2. im Finale, 3. gegen 4., 5. gegen 6. usw. Bei ungerader Zahl ist der Letzte ohne weiteres Spiel Letzter.',
   teamCount: 11,
-  teamCountRange: [4, 40],
+  teamCountRange: [4, MAX_TEAMS],
   gamesPerTeam: 4,
   playersPerTeam: 1,
   groups: [GROUP],
@@ -82,6 +98,15 @@ export const ligaphase: TournamentMode = {
     }))
   },
 
-  resolveKnockout: platzierungsspiele,
-  knockoutPlaceholders: PLATZIERUNG_PLACEHOLDERS,
+  /** 1. vs. 2., 3. vs. 4., 5. vs. 6. … – bei ungerader Zahl bleibt der Letzte ohne Spiel. */
+  resolveKnockout(state) {
+    const standings = groupComplete(state, GROUP) ? groupStandings(state, GROUP) : []
+    const at = (rank: number) => standings[rank - 1]?.teamId ?? null
+    const matches: Match[] = []
+    for (let rank = 1; rank + 1 <= state.teams.length; rank += 2) {
+      matches.push({ ...placeMatch(rank), team1Id: at(rank), team2Id: at(rank + 1) })
+    }
+    return matches
+  },
+  knockoutPlaceholders: PLACEHOLDERS,
 }

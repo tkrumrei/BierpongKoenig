@@ -70,17 +70,32 @@ describe('Ligaphase', () => {
     expect(pairings(seeded(1))).not.toBe(pairings(seeded(2)))
   })
 
-  it('Finale 1. vs. 2., Spiel um Platz 3 und höchstens Gruppenspiele + 1 pro Spieler', () => {
-    const state = makeState(11, 4)
-    // Kleinere Nummer gewinnt immer
+  it.each([
+    [11, 4],
+    [10, 3],
+  ])('%i Spieler: jeder hat ein Platzierungsspiel, bei ungerader Zahl nicht der Letzte', (count, games) => {
+    const state = makeState(count, games)
+    // Kleinere Nummer gewinnt immer → Tabelle t1, t2, t3, …
     for (const m of state.groupMatches) {
       const winner = num(m.team1Id!) < num(m.team2Id!) ? m.team1Id! : m.team2Id!
       state.results[m.id] = result(m.team1Id!, m.team2Id!, winner)
     }
-    const ko = Object.fromEntries(ligaphase.resolveKnockout(state).map((m) => [m.id, m]))
-    expect(ko.final.team1Id).not.toBeNull()
-    expect(ko.p3.team1Id).not.toBeNull()
-    const all = [...state.groupMatches, ...ligaphase.resolveKnockout(state)]
-    for (const t of state.teams) expect(gamesOf(all, t.id)).toBeLessThanOrEqual(5)
+    const ko = ligaphase.resolveKnockout(state)
+    expect(ko).toHaveLength(Math.floor(count / 2))
+    const byId = Object.fromEntries(ko.map((m) => [m.id, m]))
+    expect([byId.final.team1Id, byId.final.team2Id]).toEqual(['t1', 't2'])
+    expect([byId.p3.team1Id, byId.p3.team2Id]).toEqual(['t3', 't4'])
+    expect([byId.p5.team1Id, byId.p5.team2Id, byId.p5.label]).toEqual(['t5', 't6', 'Spiel um Platz 5'])
+
+    const all = [...state.groupMatches, ...ko]
+    for (const t of state.teams) {
+      const expected = count % 2 && t.id === `t${count}` ? games : games + 1
+      expect(gamesOf(all, t.id)).toBe(expected)
+    }
+  })
+
+  it('Platzierungsspiele bleiben offen, solange die Gruppe läuft', () => {
+    const ko = ligaphase.resolveKnockout(makeState(11, 4))
+    expect(ko.every((m) => m.team1Id === null && m.team2Id === null)).toBe(true)
   })
 })

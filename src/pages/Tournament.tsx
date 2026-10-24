@@ -195,6 +195,7 @@ export function TournamentPage() {
             [
               ['qf', 'Viertelfinale'],
               ['sf', 'Halbfinale'],
+              ['place', 'Weitere Platzierungsspiele'],
               ['p3', 'Spiel um Platz 3'],
               ['final', 'Finale'],
             ] as const

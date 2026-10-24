@@ -10,7 +10,8 @@ export interface Team {
   group: string
 }
 
-export type Stage = 'group' | 'qf' | 'sf' | 'p3' | 'final'
+/** 'place' = Spiel um Platz 5, 7, … */
+export type Stage = 'group' | 'qf' | 'sf' | 'place' | 'p3' | 'final'
 
 export interface Match {
   id: string
